@@ -1,4 +1,4 @@
-🎬 Movie Recommender Website 
+🎬 Movie Recommender Website by Group 4, Class A3, ITE.
 
 A full-featured movie recommendation web app built with React, Streamlit, and Supabase. Users can search for movies, get recommendations, scroll through an interactive list, and even stream selected titles.
 
