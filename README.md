@@ -21,6 +21,6 @@ A full-featured movie recommendation web app built with React, Streamlit, and Su
 |---------------|------------------|----------------|------------------|
 | React         | Streamlit        | TMDb API       | Scikit-learn     |
 | JavaScript    | Python           | Supabase       | Pandas           |
-| Tailwind CSS  | Flask            |                | Pickle (for data)|
+|  Vite         | Flask            |                | Pickle (for data)|
 
 
