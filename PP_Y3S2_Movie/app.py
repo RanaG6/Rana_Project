@@ -1,75 +1,54 @@
 import streamlit as st
 import pickle
 import requests
+import os
+
+tmdb_api_key = "d8584d9731f055b8a1fe2b9acda41316"
+tmdb_token = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkODU4NGQ5NzMxZjA1NWI4YTFmZTJiOWFjZGE0MTMxNiIsIm5iZiI6MTczNzYwMTAyMy41Nzc5OTk4LCJzdWIiOiI2NzkxYWZmZjIxMDQ4ZTlmNThmYTY3ZTciLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.NdU5c0fBDqJyM7kvPWf62WSRf5zVz5A_S8wCTSDijKo"
 
 def fetch_poster(movie_id):
-     url = "https://api.themoviedb.org/3/movie/{}?api_key=c7ec19ffdd3279641fb606d19ceb9bb1&language=en-US".format(movie_id)
-     data=requests.get(url)
-     data=data.json()
-     poster_path = data['poster_path']
-     full_path = "https://image.tmdb.org/t/p/w500/"+poster_path
-     return full_path
+    url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={tmdb_api_key}&language=en-US"
+    response = requests.get(url)
+    data = response.json()
+
+    poster_path = data.get('poster_path')
+    if poster_path:
+        return f"https://image.tmdb.org/t/p/w500/{poster_path}"
+    else:
+        return "https://via.placeholder.com/500x750?text=No+Image"
+
+if not os.path.exists("movies_list.pkl") or not os.path.exists("similarity.pkl"):
+    st.error("Required files 'movies_list.pkl' or 'similarity.pkl' not found.")
+    st.stop()
 
 movies = pickle.load(open("movies_list.pkl", 'rb'))
 similarity = pickle.load(open("similarity.pkl", 'rb'))
-movies_list=movies['title'].values
-
-st.header("Movie Recommender System")
-
-import streamlit.components.v1 as components
-
-imageCarouselComponent = components.declare_component("image-carousel-component", path="frontend/public")
+movies_list = movies['title'].values
 
 
-imageUrls = [
-    fetch_poster(1632),
-    fetch_poster(299536),
-    fetch_poster(17455),
-    fetch_poster(2830),
-    fetch_poster(429422),
-    fetch_poster(9722),
-    fetch_poster(13972),
-    fetch_poster(240),
-    fetch_poster(155),
-    fetch_poster(598),
-    fetch_poster(914),
-    fetch_poster(255709),
-    fetch_poster(572154)
-   
-    ]
+st.title("🎬 Movie Recommender System")
 
-
-imageCarouselComponent(imageUrls=imageUrls, height=200)
-selectvalue=st.selectbox("Select movie from dropdown", movies_list)
+selected_movie = st.selectbox("Choose a movie to get similar recommendations:", movies_list)
 
 def recommend(movie):
-    index=movies[movies['title']==movie].index[0]
-    distance = sorted(list(enumerate(similarity[index])), reverse=True, key=lambda vector:vector[1])
-    recommend_movie=[]
-    recommend_poster=[]
-    for i in distance[1:6]:
-        movies_id=movies.iloc[i[0]].id
-        recommend_movie.append(movies.iloc[i[0]].title)
-        recommend_poster.append(fetch_poster(movies_id))
-    return recommend_movie, recommend_poster
+    index = movies[movies['title'] == movie].index[0]
+    distances = sorted(enumerate(similarity[index]), reverse=True, key=lambda x: x[1])
+    
+    recommended_movies = []
+    recommended_posters = []
 
+    for i in distances[1:6]:
+        movie_id = movies.iloc[i[0]].id
+        recommended_movies.append(movies.iloc[i[0]].title)
+        recommended_posters.append(fetch_poster(movie_id))
 
+    return recommended_movies, recommended_posters
 
-if st.button("Show Recommend"):
-    movie_name, movie_poster = recommend(selectvalue)
-    col1,col2,col3,col4,col5=st.columns(5)
-    with col1:
-        st.text(movie_name[0])
-        st.image(movie_poster[0])
-    with col2:
-        st.text(movie_name[1])
-        st.image(movie_poster[1])
-    with col3:
-        st.text(movie_name[2])
-        st.image(movie_poster[2])
-    with col4:
-        st.text(movie_name[3])
-        st.image(movie_poster[3])
-    with col5:
-        st.text(movie_name[4])
-        st.image(movie_poster[4])
+if st.button("Show Recommendations"):
+    names, posters = recommend(selected_movie)
+
+    cols = st.columns(5)
+    for i in range(5):
+        with cols[i]:
+            st.text(names[i])
+            st.image(posters[i])
