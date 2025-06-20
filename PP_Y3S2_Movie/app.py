@@ -3,9 +3,8 @@ import pickle
 import requests
 import os
 
-tmdb_api_key = "d8584d9731f055b8a1fe2b9acda41316"
-tmdb_token = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkODU4NGQ5NzMxZjA1NWI4YTFmZTJiOWFjZGE0MTMxNiIsIm5iZiI6MTczNzYwMTAyMy41Nzc5OTk4LCJzdWIiOiI2NzkxYWZmZjIxMDQ4ZTlmNThmYTY3ZTciLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.NdU5c0fBDqJyM7kvPWf62WSRf5zVz5A_S8wCTSDijKo"
-
+tmdb_api_key = ""
+tmdb_token = ""
 def fetch_poster(movie_id):
     url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={tmdb_api_key}&language=en-US"
     response = requests.get(url)
